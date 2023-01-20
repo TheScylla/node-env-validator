@@ -1,13 +1,14 @@
 {
   "name": "node-env-validator",
-  "version": "0.0.2",
+  "version": "0.0.9",
   "description": "Package to validate unsecure inputs such as .env inputs",
-  "main": "src/index.ts",
+  "main": "src/index.js",
   "types": "src/index.ts",
   "publishConfig": {
     "main": "dist/index.js",
-    "types": "dist/index.d.js"
+    "types": "dist/index.d.ts"
   },
+  "files": ["dist/*"],
   "scripts": {
     "lint": "eslint \"{src,apps,libs,test,core}/**/*.ts\" --fix",
     "lint:check": "eslint \"{src,apps,libs,test,core}/**/*.ts\" --max-warnings 0",
@@ -18,7 +19,7 @@
     "type": "git",
     "url": "https://github.com/TheScylla/node-env-validator"
   },
-  "keywords": [],
+  "keywords": ["schema", "validation", "env", "config"],
   "author": "scylla",
   "license": "ISC",
   "bugs": {

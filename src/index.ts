@@ -26,9 +26,9 @@ export const hostValidation = (envKey: string): string => {
   );
 };
 
-export const oneOfArrayValidation = <T = unknown>(envKey: string): T => {
+export const oneOfArrayValidation = <T = unknown>(envKey: string, inputArray: unknown[]): T => {
   return validateValue(
-    Joi.valid(...['mysql', 'postgres', 'sqlite', 'mariadb', 'mssql', 'db2', 'snowflake', 'oracle'])
+    Joi.valid(...inputArray)
       .required()
       .error(new Error(`process.env.'${envKey} should be one of the input array`))
       .validate(process.env[envKey]),
