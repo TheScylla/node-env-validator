@@ -1,0 +1,8 @@
+node_modules
+src
+.eslintrc.js
+.prettierrc
+.gitignore
+.npmignore
+.vscode
+pnpm-lock.yaml

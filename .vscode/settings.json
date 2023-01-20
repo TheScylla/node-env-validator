@@ -1,0 +1,16 @@
+{
+  "javascript.validate.enable": true,
+  "editor.tabSize": 2,
+  "eslint.validate": ["javascript"],
+  "editor.formatOnSave": false,
+  "[javascript]": {
+    "editor.formatOnSave": false
+  },
+  "eslint.options": {
+    "experimentalDecorators": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
