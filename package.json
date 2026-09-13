@@ -1,6 +1,6 @@
 {
   "name": "node-env-validator",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Package to validate unsecure inputs such as .env inputs",
   "main": "src/index.js",
   "types": "src/index.ts",

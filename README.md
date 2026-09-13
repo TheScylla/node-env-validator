@@ -46,6 +46,10 @@ const config = {
 | `oneOfArrayValidation(key, values)` | `T` | unset, or outside `values` |
 | `numberValidation(key)` | `number` | unset, or not a finite number |
 | `numberValidation(key, default)` | `number` | set **and** not a finite number |
+| `stringValidation(key, default)` | `string` | set **and** empty |
+| `optionalStringValidation(key)` | `string \| null` | never — absent, empty and whitespace give `null` |
+| `durationValidation(key[, default])` | `Duration` | not `30s` / `15m` / `2h` shaped |
+| `booleanValidation(key[, default])` | `boolean` | not a boolean |
 
 ### `numberValidation` and its one asymmetry
 
@@ -65,7 +69,28 @@ const rate = Number.isFinite(n) ? n : 30;
 
 `Infinity`, `-Infinity` and `NaN` are rejected, so the value is always finite.
 
+### `durationValidation` checks, it does not just type
+
+`Duration` is `` `${number}s` | `${number}m` | `${number}h` ``. Twelve configurations in one
+ecosystem declared that exact type and then wrote:
+
+```ts
+return value as RateLimitWindow; // erased at compile time — nothing looks at the value
+```
+
+`30x` and `abc` both reached the rate limiter as valid windows. `durationValidation` runs the
+pattern first and casts after, so the type is earned rather than asserted.
+
 ## Changelog
+
+### 0.2.0
+
+- **Added `durationValidation(key, default?)`** and the `Duration` type.
+- **Added `optionalStringValidation(key)`** — `string | null`, whitespace counts as absent.
+- **Added `booleanValidation(key, default?)`** — a typo throws instead of silently becoming `false`,
+  which is what `process.env.X === 'true'` does to one.
+- **`stringValidation` takes an optional default**, like `numberValidation`. Existing one-argument
+  calls are unchanged.
 
 ### 0.1.0
 

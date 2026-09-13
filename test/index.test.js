@@ -13,6 +13,9 @@ const {
   hostValidation,
   uriValidation,
   oneOfArrayValidation,
+  durationValidation,
+  optionalStringValidation,
+  booleanValidation,
 } = require('../dist/index.js');
 
 const KEY = 'NODE_ENV_VALIDATOR_TEST_KEY';
@@ -136,5 +139,91 @@ test('the other validators still behave', () => {
   assert.throws(
     () => withEnv('c', () => oneOfArrayValidation(KEY, ['a', 'b'])),
     /should be one of the input array/,
+  );
+});
+
+test('durationValidation: accepts the three units', () => {
+  for (const [raw, expected] of [
+    ['30s', '30s'],
+    ['15m', '15m'],
+    ['2h', '2h'],
+    ['1.5h', '1.5h'],
+  ]) {
+    assert.strictEqual(
+      withEnv(raw, () => durationValidation(KEY)),
+      expected,
+    );
+  }
+});
+
+test('durationValidation: rejects what the hand-rolled cast let through', () => {
+  // Twelve configs wrote `return value as RateLimitWindow`, which checks nothing at runtime.
+  // Every one of these reached the rate limiter as a "valid" window.
+  for (const bad of ['30x', 'abc', '30', 's', '30 s', '', '30sm', '-5s']) {
+    assert.throws(
+      () => withEnv(bad, () => durationValidation(KEY)),
+      /should be a duration/,
+      `expected ${JSON.stringify(bad)} to be rejected`,
+    );
+  }
+});
+
+test('durationValidation: default form takes the default when unset, throws when garbage', () => {
+  assert.strictEqual(
+    withEnv(undefined, () => durationValidation(KEY, '30s')),
+    '30s',
+  );
+  assert.strictEqual(
+    withEnv('5m', () => durationValidation(KEY, '30s')),
+    '5m',
+  );
+  assert.throws(() => withEnv('30x', () => durationValidation(KEY, '30s')), /should be a duration/);
+});
+
+test('stringValidation: optional form takes the default when unset', () => {
+  assert.strictEqual(
+    withEnv(undefined, () => stringValidation(KEY, 'fallback')),
+    'fallback',
+  );
+  assert.strictEqual(
+    withEnv('explicit', () => stringValidation(KEY, 'fallback')),
+    'explicit',
+  );
+});
+
+test('optionalStringValidation: absent, empty and whitespace all give null', () => {
+  for (const raw of [undefined, '', '   ']) {
+    assert.strictEqual(
+      withEnv(raw, () => optionalStringValidation(KEY)),
+      null,
+      `expected ${JSON.stringify(raw)} to give null`,
+    );
+  }
+  assert.strictEqual(
+    withEnv('value', () => optionalStringValidation(KEY)),
+    'value',
+  );
+});
+
+test('booleanValidation: accepts booleans and rejects a typo instead of calling it false', () => {
+  assert.strictEqual(
+    withEnv('true', () => booleanValidation(KEY)),
+    true,
+  );
+  assert.strictEqual(
+    withEnv('false', () => booleanValidation(KEY)),
+    false,
+  );
+  // `process.env.X === 'true'` turns every one of these into a silent `false`.
+  for (const bad of ['tru', 'yes', '1', 'oui']) {
+    assert.throws(
+      () => withEnv(bad, () => booleanValidation(KEY)),
+      /should be a boolean/,
+      `expected ${JSON.stringify(bad)} to be rejected`,
+    );
+  }
+  assert.strictEqual(
+    withEnv(undefined, () => booleanValidation(KEY, false)),
+    false,
   );
 });
