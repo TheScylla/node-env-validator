@@ -83,6 +83,17 @@ pattern first and casts after, so the type is earned rather than asserted.
 
 ## Changelog
 
+### 0.2.1
+
+**Publish fix — 0.1.0 and 0.2.0 are broken, do not use them.** Both were published with
+`npm publish`, which does **not** substitute `publishConfig` fields into the published manifest —
+that is a `pnpm` behaviour. So both shipped `"main": "src/index.js"` and `"types": "src/index.ts"`
+while `files` ships only `dist`: the entry points name paths the tarball does not contain, and every
+consumer fails with `Cannot find module 'node-env-validator'`.
+
+0.0.9 was fine because it was published with `pnpm publish`. **Always publish this package with
+`pnpm publish`.** No source change in this version.
+
 ### 0.2.0
 
 - **Added `durationValidation(key, default?)`** and the `Duration` type.
